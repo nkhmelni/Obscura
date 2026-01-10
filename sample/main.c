@@ -7,7 +7,7 @@
  * - Per-variable annotations (NO_ENC, L2G, NO_L2G)
  *
  * Compile with CMake or directly:
- *   clang -fpass-plugin=path/to/libEncryption.dylib \
+ *   clang -fpass-plugin=path/to/libObscura.dylib \
  *         -DENC_FULL -DL2G_ENABLE \
  *         -I path/to/include -include enc_options.h \
  *         main.c -o sample

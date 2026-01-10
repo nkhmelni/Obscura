@@ -56,7 +56,7 @@ Download the release that matches your LLVM version. Using a mismatched version 
    ```
    obscura-llvm17.0.6-arm64/
    ├── lib/
-   │   ├── libEncryption.dylib
+   │   ├── libObscura.dylib
    │   └── libEncDeps.dylib
    └── include/
        └── enc_options.h
@@ -71,7 +71,7 @@ Both `.dylib` files must be in the same directory.
 Without including `enc_options.h`, full encryption runs automatically:
 
 ```bash
-clang -fpass-plugin=/path/to/libEncryption.dylib program.c -o program
+clang -fpass-plugin=/path/to/libObscura.dylib program.c -o program
 ```
 
 This applies full encryption with default settings (Lite + Deep, 1 iteration each, no inlining). Filters and L2G are not available in this mode.
@@ -81,27 +81,27 @@ This applies full encryption with default settings (Lite + Deep, 1 iteration eac
 Include `enc_options.h` for full control:
 
 ```bash
-clang -fpass-plugin=/path/to/libEncryption.dylib \
-      -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE \
-      -DL2G_ENABLE \
+clang -fpass-plugin=/path/to/libObscura.dylib \
+      -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE \
       -I /path/to/include -include /path/to/include/enc_options.h \
       program.c -o program
 ```
 
-### CMake Integration
+### Build System Integration
 
 ```cmake
-set(ENC_PLUGIN "/path/to/libEncryption.dylib")
-set(ENC_INCLUDE "/path/to/include")
+# CMake
+set(OBSCURA_PLUGIN "/path/to/libObscura.dylib")
+set(OBSCURA_INCLUDE "/path/to/include")
 
 add_compile_options(
-    -fpass-plugin=${ENC_PLUGIN}
+    -fpass-plugin=${OBSCURA_PLUGIN}
     -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE
-    -I${ENC_INCLUDE} -include ${ENC_INCLUDE}/enc_options.h
+    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/enc_options.h
 )
 ```
 
-See [Combined Usage](docs/COMBINED.md) for complete CMake examples and flag reference.
+See [Combined Usage](docs/COMBINED.md) for Makefile integration and flag reference.
 
 ## Documentation
 

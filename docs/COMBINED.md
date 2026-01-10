@@ -12,74 +12,31 @@ Each module is processed independently by the compiler, which means you can conf
 
 You can apply different settings to different source files by using `#define` directives before including `enc_options.h`.
 
-### Project-Wide Settings via CMake
-
-The minimal CMake integration looks like this:
+### CMake
 
 ```cmake
-cmake_minimum_required(VERSION 3.20)
-project(MyProject C)
+set(OBSCURA_PLUGIN "/path/to/libObscura.dylib")
+set(OBSCURA_INCLUDE "/path/to/include")
 
-# Path to the Encryption Pass
-set(ENC_PLUGIN "/path/to/libEncryption.dylib")
-set(ENC_INCLUDE "/path/to/include")
-
-# Apply encryption to all source files
 add_compile_options(
-    -fpass-plugin=${ENC_PLUGIN}
-    -DENC_FULL -DENC_FULL_TIMES=15 -DENC_DEEP_INLINE -DL2G_ENABLE
-    -I${ENC_INCLUDE} -include ${ENC_INCLUDE}/enc_options.h
+    -fpass-plugin=${OBSCURA_PLUGIN}
+    -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE
+    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/enc_options.h
 )
-
-add_executable(myapp main.c utils.c)
 ```
 
-This is the recommended pattern - it's concise and applies encryption uniformly across your project. The key parts are:
-
-1. **`-fpass-plugin=${ENC_PLUGIN}`** - Load the encryption plugin
-2. **`-D` flags** - Configure encryption behavior
-3. **`-I${ENC_INCLUDE} -include ${ENC_INCLUDE}/enc_options.h`** - Include the configuration header
-
-These settings apply to all source files unless overridden.
-
-### Project-Wide Settings via Makefile
-
-For Makefile-based projects:
+### Makefile
 
 ```makefile
-# Obscura paths
-ENC_PLUGIN  := /path/to/libEncryption.dylib
-ENC_INCLUDE := /path/to/include
+OBSCURA_PLUGIN  := /path/to/libObscura.dylib
+OBSCURA_INCLUDE := /path/to/include
 
-# Encryption flags
-ENC_FLAGS := -fpass-plugin=$(ENC_PLUGIN) \
-             -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE \
-             -I$(ENC_INCLUDE) -include $(ENC_INCLUDE)/enc_options.h
+OBSCURA_FLAGS := -fpass-plugin=$(OBSCURA_PLUGIN) \
+                 -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE \
+                 -I$(OBSCURA_INCLUDE) -include $(OBSCURA_INCLUDE)/enc_options.h
 
-# Apply to compiler flags
-CC     := clang
-CFLAGS := -O2 $(ENC_FLAGS)
-
-# Build rules
-TARGET := myapp
-SRCS   := main.c utils.c
-OBJS   := $(SRCS:.c=.o)
-
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
-	$(CC) -o $@ $^
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-clean:
-	rm -f $(TARGET) $(OBJS)
-
-.PHONY: all clean
+CFLAGS += $(OBSCURA_FLAGS)
 ```
-
-The pattern is the same: define `ENC_FLAGS` with the plugin path and configuration, then include it in `CFLAGS`.
 
 ### Module-Specific Overrides
 
@@ -151,24 +108,17 @@ Here's a complete example using all features together:
 cmake_minimum_required(VERSION 3.20)
 project(MySecureApp)
 
-set(ENC_PLUGIN "/path/to/libEncryption.dylib")
-set(ENC_INCLUDE "/path/to/include")
+set(OBSCURA_PLUGIN "/path/to/libObscura.dylib")
+set(OBSCURA_INCLUDE "/path/to/include")
 
 add_compile_options(
-    -fpass-plugin=${ENC_PLUGIN}
-    -DENC_FULL
-    -DENC_FULL_TIMES=5
-    -DENC_DEEP_INLINE
-    -DL2G_ENABLE
-    -DL2G_OPS
-    -I${ENC_INCLUDE} -include ${ENC_INCLUDE}/enc_options.h
+    -fpass-plugin=${OBSCURA_PLUGIN}
+    -DENC_FULL -DENC_FULL_TIMES=5 -DENC_DEEP_INLINE
+    -DL2G_ENABLE -DL2G_OPS
+    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/enc_options.h
 )
 
-add_executable(myapp
-    main.c
-    crypto.c
-    utils.c
-)
+add_executable(myapp main.c crypto.c utils.c)
 ```
 
 ### main.c
@@ -344,9 +294,9 @@ Annotations provide the finest control:
 
 High `ENC_DEEP_TIMES` with `ENC_DEEP_INLINE` can cause disassemblers like IDA to fail pseudocode generation. This is actually a feature for protection, but can complicate debugging. Use lower values during development.
 
-## CMake Flag Reference
+## Flag Reference
 
-Here's a complete reference of all `-D` flags you can use in your CMake configuration:
+All available `-D` flags:
 
 ### Encryption Levels
 
@@ -403,31 +353,6 @@ Here's a complete reference of all `-D` flags you can use in your CMake configur
 | `-DL2G_DEDUP` | Deduplicate identical constants |
 | `-DL2G_PROB=n` | Promotion probability (0-100) |
 | `-DL2G_MAX_ARRAY=n` | Maximum array size |
-
-### Example: Full Configuration
-
-```cmake
-add_compile_options(
-    -fpass-plugin=${ENC_PLUGIN}
-
-    # Encryption
-    -DENC_FULL
-    -DENC_FULL_TIMES=5
-    -DENC_DEEP_INLINE
-
-    # Filters
-    '-DENC_SKIP_NAME="debug,test"'
-    -DENC_ARRAYS_LITE_ONLY
-
-    # L2G
-    -DL2G_ENABLE
-    -DL2G_OPS
-    -DL2G_PROB=80
-
-    # Header
-    -I${ENC_INCLUDE} -include ${ENC_INCLUDE}/enc_options.h
-)
-```
 
 > **Note**
 >

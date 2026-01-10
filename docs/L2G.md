@@ -184,7 +184,7 @@ int main(void) {
 ### Compile with Annotations Only
 
 ```bash
-clang -fpass-plugin=path/to/libEncryption.dylib \
+clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL \
       -I path/to/include -include enc_options.h \
       example.c -o example
@@ -195,7 +195,7 @@ Only `key` and `public_key` (the annotated variables) are promoted. `public_key`
 ### Compile with Automatic Promotion
 
 ```bash
-clang -fpass-plugin=path/to/libEncryption.dylib \
+clang -fpass-plugin=path/to/libObscura.dylib \
       -DL2G_ENABLE -DENC_FULL \
       -I path/to/include -include enc_options.h \
       example.c -o example

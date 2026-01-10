@@ -183,7 +183,7 @@ Compile with selective encryption:
 
 ```bash
 # Encrypt only "secret" variables, skip arrays
-clang -fpass-plugin=path/to/libEncryption.dylib \
+clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL \
       '-DENC_ONLY_NAME="secret"' \
       -DENC_SKIP_ARRAYS \

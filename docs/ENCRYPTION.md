@@ -48,14 +48,14 @@ When you include the header, you gain explicit control. Nothing runs unless you 
 
 ```bash
 # Full encryption with defaults (no configuration needed)
-clang -fpass-plugin=path/to/libEncryption.dylib program.c
+clang -fpass-plugin=path/to/libObscura.dylib program.c
 ```
 
 ### Explicit Mode
 
 ```bash
 # Include the header for explicit control
-clang -fpass-plugin=path/to/libEncryption.dylib \
+clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL \
       -I path/to/include -include enc_options.h \
       program.c
@@ -154,7 +154,7 @@ int main(void) {
 Compile with encryption:
 
 ```bash
-clang -fpass-plugin=path/to/libEncryption.dylib \
+clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE \
       -I path/to/include -include enc_options.h \
       example.c -o example
