@@ -1,4 +1,4 @@
-# Obscura (Encryption Pass)
+# Obscura
 
 An LLVM pass plugin that encrypts global variable initializers and inserts runtime decryption code. Protects sensitive data from static analysis while maintaining full runtime functionality.
 
@@ -12,9 +12,18 @@ An LLVM pass plugin that encrypts global variable initializers and inserts runti
 
 ## Compatibility
 
-The Encryption Pass is built against a specific LLVM version. Your compiler's LLVM version must match the build version for correct operation.
+Obscura is built against a specific LLVM version. Your compiler's LLVM version must match the build version for correct operation.
 
 **Why this matters:** Different LLVM versions have slightly different internal ABIs. If the versions don't match, symbols may be resolved incorrectly, leading to crashes or undefined behavior.
+
+### Tested Configuration
+
+The current release was tested with:
+- **LLVM 17.0.6**
+- **AppleClang 16.0.0** (clang-1600.0.26.4)
+- **Languages:** C, C++, Objective-C, Objective-C++
+
+Other LLVM-based compilers that support plugins (e.g., Swift, Rust) may also work if they use a compatible LLVM version—this is untested and left for you to explore.
 
 ### Xcode Users
 
@@ -41,11 +50,11 @@ Download the release that matches your LLVM version. Using a mismatched version 
 1. Download the release matching your LLVM version from [Releases](../../releases)
 2. Extract the archive:
    ```bash
-   tar -xzf encryption-pass-llvm17.tar.gz
+   tar -xzf obscura-llvm17.0.6-arm64.tar.gz
    ```
 3. You'll have:
    ```
-   encryption-pass/
+   obscura-llvm17.0.6-arm64/
    ├── lib/
    │   ├── libEncryption.dylib
    │   └── libEncDeps.dylib
