@@ -1,4 +1,4 @@
-# Encryption Pass
+# Obscura (Encryption Pass)
 
 An LLVM pass plugin that encrypts global variable initializers and inserts runtime decryption code. Protects sensitive data from static analysis while maintaining full runtime functionality.
 
