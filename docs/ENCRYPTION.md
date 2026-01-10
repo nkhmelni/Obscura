@@ -6,6 +6,8 @@ This document covers the encryption levels, options, and behavior of the Encrypt
 
 The Encryption Pass protects global variable initializers by encrypting their values at compile time and inserting runtime decryption code. This makes static analysis significantly harder, as sensitive data is not visible in the binary's data sections.
 
+> **Important:** Compile with `-O0` or `-O1` for proper obfuscation. Higher optimization levels may inline or eliminate the decryption code, reducing protection.
+
 ## Encryption Levels
 
 Three encryption levels are available:
