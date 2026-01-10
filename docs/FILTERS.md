@@ -18,7 +18,7 @@ When both are used, whitelist filters are applied first, then blacklist exclusio
 The `NO_ENC` annotation excludes a specific variable from encryption. This works on both global and local variables.
 
 ```c
-#include "enc_options.h"
+#include "config.h"
 
 NO_ENC static int32_t public_counter = 0;  // Never encrypted
 static int32_t secret_key = 0x12345678;    // Encrypted normally
@@ -154,7 +154,7 @@ clang ... -DENC_FULL \
 ```c
 #include <stdio.h>
 #include <stdint.h>
-#include "enc_options.h"
+#include "config.h"
 
 // Annotation-based exclusion
 NO_ENC static int32_t public_counter = 0;
@@ -187,7 +187,7 @@ clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL \
       '-DENC_ONLY_NAME="secret"' \
       -DENC_SKIP_ARRAYS \
-      -I path/to/include -include enc_options.h \
+      -I path/to/include -include config.h \
       example.c -o example
 ```
 

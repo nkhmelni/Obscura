@@ -32,7 +32,7 @@ Full encryption applies both Lite and Deep levels sequentially. This is equivale
 
 ## Default Behavior
 
-The pass operates in two modes depending on whether you include `enc_options.h`:
+The pass operates in two modes depending on whether you include `config.h`:
 
 | Configuration | Behavior |
 |---------------|----------|
@@ -59,7 +59,7 @@ clang -fpass-plugin=path/to/libObscura.dylib program.c
 # Include the header for explicit control
 clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL \
-      -I path/to/include -include enc_options.h \
+      -I path/to/include -include config.h \
       program.c
 ```
 
@@ -67,13 +67,13 @@ clang -fpass-plugin=path/to/libObscura.dylib \
 
 ```bash
 # Lite encryption only
-clang ... -DENC_LITE -I path/to/include -include enc_options.h program.c
+clang ... -DENC_LITE -I path/to/include -include config.h program.c
 
 # Deep encryption only
-clang ... -DENC_DEEP -I path/to/include -include enc_options.h program.c
+clang ... -DENC_DEEP -I path/to/include -include config.h program.c
 
 # Full encryption (both levels)
-clang ... -DENC_FULL -I path/to/include -include enc_options.h program.c
+clang ... -DENC_FULL -I path/to/include -include config.h program.c
 ```
 
 ## Encryption Options
@@ -158,7 +158,7 @@ Compile with encryption:
 ```bash
 clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE \
-      -I path/to/include -include enc_options.h \
+      -I path/to/include -include config.h \
       example.c -o example
 ```
 

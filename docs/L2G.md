@@ -27,7 +27,7 @@ L2G operates in two modes:
 Use the `L2G` annotation to mark specific variables for promotion:
 
 ```c
-#include "enc_options.h"
+#include "config.h"
 
 void process(void) {
     L2G int32_t secret = 0xDEADBEEF;  // Always promoted
@@ -42,13 +42,13 @@ Marker-based promotion works even without the `L2G_ENABLE` flag.
 Enable automatic promotion with `L2G_ENABLE`:
 
 ```bash
-clang ... -DL2G_ENABLE -I path/to/include -include enc_options.h ...
+clang ... -DL2G_ENABLE -I path/to/include -include config.h ...
 ```
 
 With automatic promotion, all eligible local constants are promoted unless excluded with `NO_L2G`:
 
 ```c
-#include "enc_options.h"
+#include "config.h"
 
 void process(void) {
     int32_t secret = 0xDEADBEEF;       // Promoted automatically
@@ -154,7 +154,7 @@ clang ... -DL2G_ENABLE -DL2G_MAX_ARRAY=16 ...
 ```c
 #include <stdio.h>
 #include <stdint.h>
-#include "enc_options.h"
+#include "config.h"
 
 int process_data(void) {
     // Annotation-based: always promoted
@@ -186,7 +186,7 @@ int main(void) {
 ```bash
 clang -fpass-plugin=path/to/libObscura.dylib \
       -DENC_FULL \
-      -I path/to/include -include enc_options.h \
+      -I path/to/include -include config.h \
       example.c -o example
 ```
 
@@ -197,7 +197,7 @@ Only `key` and `public_key` (the annotated variables) are promoted. `public_key`
 ```bash
 clang -fpass-plugin=path/to/libObscura.dylib \
       -DL2G_ENABLE -DENC_FULL \
-      -I path/to/include -include enc_options.h \
+      -I path/to/include -include config.h \
       example.c -o example
 ```
 

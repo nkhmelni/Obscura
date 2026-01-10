@@ -10,7 +10,7 @@ Each module is processed independently by the compiler, which means you can conf
 
 ## Per-Module Configuration
 
-You can apply different settings to different source files by using `#define` directives before including `enc_options.h`.
+You can apply different settings to different source files by using `#define` directives before including `config.h`.
 
 ### CMake
 
@@ -21,7 +21,7 @@ set(OBSCURA_INCLUDE "/path/to/include")
 add_compile_options(
     -fpass-plugin=${OBSCURA_PLUGIN}
     -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE
-    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/enc_options.h
+    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/config.h
 )
 ```
 
@@ -33,7 +33,7 @@ OBSCURA_INCLUDE := /path/to/include
 
 OBSCURA_FLAGS := -fpass-plugin=$(OBSCURA_PLUGIN) \
                  -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE \
-                 -I$(OBSCURA_INCLUDE) -include $(OBSCURA_INCLUDE)/enc_options.h
+                 -I$(OBSCURA_INCLUDE) -include $(OBSCURA_INCLUDE)/config.h
 
 CFLAGS += $(OBSCURA_FLAGS)
 ```
@@ -49,7 +49,7 @@ In any source file, you can override settings by placing `#define` directives be
 #define ENC_ONLY_NAME "secret"   // Only encrypt variables with "secret" in name
 #define L2G_PROB 50              // Only promote 50% of constants
 
-#include "enc_options.h"
+#include "config.h"
 
 static int32_t secret_key = 0xDEADBEEF;   // Encrypted (matches "secret")
 static int32_t other_value = 0x12345678;  // Not encrypted (doesn't match)
@@ -67,7 +67,7 @@ You might want maximum protection for files containing sensitive data, but light
 // Maximum protection for this module
 #define ENC_FULL_TIMES 10
 #define ENC_DEEP_INLINE
-#include "enc_options.h"
+#include "config.h"
 
 static int32_t master_key = 0xDEADBEEF;
 static int32_t encryption_iv[4] = {0x11, 0x22, 0x33, 0x44};
@@ -78,7 +78,7 @@ static int32_t encryption_iv[4] = {0x11, 0x22, 0x33, 0x44};
 // Lighter protection for utility code
 #define ENC_LITE_TIMES 2
 #undef ENC_DEEP  // Disable deep encryption
-#include "enc_options.h"
+#include "config.h"
 
 static int32_t buffer_size = 4096;
 ```
@@ -91,7 +91,7 @@ If your project-wide settings encrypt everything, but one module has variables y
 ```c
 // Skip debug-related variables in this module
 #define ENC_SKIP_NAME "debug,log,trace"
-#include "enc_options.h"
+#include "config.h"
 
 static int32_t debug_level = 3;      // Not encrypted
 static int32_t log_buffer_size = 1024; // Not encrypted
@@ -115,7 +115,7 @@ add_compile_options(
     -fpass-plugin=${OBSCURA_PLUGIN}
     -DENC_FULL -DENC_FULL_TIMES=5 -DENC_DEEP_INLINE
     -DL2G_ENABLE -DL2G_OPS
-    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/enc_options.h
+    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/config.h
 )
 
 add_executable(myapp main.c crypto.c utils.c)
@@ -126,7 +126,7 @@ add_executable(myapp main.c crypto.c utils.c)
 ```c
 #include <stdio.h>
 #include <stdint.h>
-#include "enc_options.h"
+#include "config.h"
 
 // Global encrypted data
 static int32_t app_version = 0x010203;
@@ -149,7 +149,7 @@ int main(void) {
 ```c
 // Maximum protection for crypto module
 #define ENC_FULL_TIMES 10
-#include "enc_options.h"
+#include "config.h"
 
 static int32_t secret_key = 0xDEADBEEF;
 static int32_t key_schedule[16] = {
@@ -169,7 +169,7 @@ int32_t encrypt_block(int32_t data) {
 // Lighter encryption for utilities, skip arrays
 #define ENC_LITE_TIMES 2
 #define ENC_SKIP_ARRAYS
-#include "enc_options.h"
+#include "config.h"
 
 static int32_t buffer_sizes[4] = {256, 512, 1024, 2048};  // Not encrypted
 static int32_t default_timeout = 30000;  // Encrypted
@@ -232,7 +232,7 @@ Use L2G for code complexity without the performance cost of encryption:
 ```c
 #define L2G_ENABLE
 // Don't define any ENC_* flags
-#include "enc_options.h"
+#include "config.h"
 
 void process(void) {
     int32_t multiplier = 42;  // Promoted to global, but not encrypted
@@ -255,7 +255,7 @@ Filters apply to all globals, including those promoted by L2G:
 #define L2G_ENABLE
 #define ENC_FULL
 #define ENC_ONLY_INTEGERS
-#include "enc_options.h"
+#include "config.h"
 
 void process(void) {
     int32_t int_val = 42;    // Promoted AND encrypted
@@ -278,7 +278,7 @@ Annotations provide the finest control:
 
 ### Variables Not Being Encrypted
 
-1. Check if `enc_options.h` is included (implicit mode runs without it)
+1. Check if `config.h` is included (implicit mode runs without it)
 2. Check if a filter is excluding the variable
 3. Check if `NO_ENC` is applied
 4. For locals, check if L2G is enabled or `L2G` annotation is used

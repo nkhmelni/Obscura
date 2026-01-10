@@ -59,7 +59,7 @@ Download the release that matches your LLVM version. Using a mismatched version 
    │   ├── libObscura.dylib
    │   └── libDeps.dylib
    └── include/
-       └── enc_options.h
+       └── config.h
    ```
 
 Both `.dylib` files must be in the same directory.
@@ -68,7 +68,7 @@ Both `.dylib` files must be in the same directory.
 
 ### Minimal Usage (Implicit Mode)
 
-Without including `enc_options.h`, full encryption runs automatically:
+Without including `config.h`, full encryption runs automatically:
 
 ```bash
 clang -fpass-plugin=/path/to/libObscura.dylib program.c -o program
@@ -78,12 +78,12 @@ This applies full encryption with default settings (Lite + Deep, 1 iteration eac
 
 ### Explicit Mode (Recommended)
 
-Include `enc_options.h` for full control:
+Include `config.h` for full control:
 
 ```bash
 clang -fpass-plugin=/path/to/libObscura.dylib \
       -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE \
-      -I /path/to/include -include /path/to/include/enc_options.h \
+      -I /path/to/include -include /path/to/include/config.h \
       program.c -o program
 ```
 
@@ -97,7 +97,7 @@ set(OBSCURA_INCLUDE "/path/to/include")
 add_compile_options(
     -fpass-plugin=${OBSCURA_PLUGIN}
     -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE
-    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/enc_options.h
+    -I${OBSCURA_INCLUDE} -include ${OBSCURA_INCLUDE}/config.h
 )
 ```
 
@@ -135,7 +135,7 @@ See [Combined Usage](docs/COMBINED.md) for Makefile integration and flag referen
 Use these in your code for per-variable control:
 
 ```c
-#include "enc_options.h"
+#include "config.h"
 
 NO_ENC static int32_t public_val = 1;   // Never encrypted
 
@@ -151,7 +151,7 @@ void func(void) {
 ```c
 #include <stdio.h>
 #include <stdint.h>
-#include "enc_options.h"
+#include "config.h"
 
 static int32_t secret_key = 0xDEADBEEF;
 NO_ENC static int32_t version = 0x0102;

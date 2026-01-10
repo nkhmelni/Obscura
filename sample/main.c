@@ -9,13 +9,13 @@
  * Compile with CMake or directly:
  *   clang -fpass-plugin=path/to/libObscura.dylib \
  *         -DENC_FULL -DL2G_ENABLE \
- *         -I path/to/include -include enc_options.h \
+ *         -I path/to/include -include config.h \
  *         main.c -o sample
  */
 
 #include <stdio.h>
 #include <stdint.h>
-#include "enc_options.h"
+#include "config.h"
 
 /*============================================================================*
  * Global Variables - Encrypted by default

@@ -1,5 +1,5 @@
 /*
- * enc_options.h - Encryption Pass Configuration Header
+ * config.h - Obscura Configuration Header
  *
  * Include this header to enable explicit control over encryption behavior.
  * All options are configured via compiler flags (-D).
@@ -7,8 +7,8 @@
  * See README.md for complete documentation.
  */
 
-#ifndef ENC_OPTIONS_H
-#define ENC_OPTIONS_H
+#ifndef OBSCURA_CONFIG_H
+#define OBSCURA_CONFIG_H
 
 /*============================================================================*
  * ENCRYPTION LEVELS
@@ -224,4 +224,4 @@ __attribute__((used)) static int __l2g_probability = L2G_PROB;
 __attribute__((used)) static int __l2g_max_array = L2G_MAX_ARRAY;
 #endif
 
-#endif /* ENC_OPTIONS_H */
+#endif /* OBSCURA_CONFIG_H */

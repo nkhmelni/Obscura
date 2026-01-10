@@ -22,7 +22,7 @@ cmake .. && make
 ```bash
 clang -fpass-plugin=/path/to/libObscura.dylib \
       -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE \
-      -I /path/to/include -include /path/to/include/enc_options.h \
+      -I /path/to/include -include /path/to/include/config.h \
       main.c -o sample
 ```
 
