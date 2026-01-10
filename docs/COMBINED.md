@@ -42,6 +42,45 @@ This is the recommended pattern - it's concise and applies encryption uniformly 
 
 These settings apply to all source files unless overridden.
 
+### Project-Wide Settings via Makefile
+
+For Makefile-based projects:
+
+```makefile
+# Obscura paths
+ENC_PLUGIN  := /path/to/libEncryption.dylib
+ENC_INCLUDE := /path/to/include
+
+# Encryption flags
+ENC_FLAGS := -fpass-plugin=$(ENC_PLUGIN) \
+             -DENC_FULL -DENC_FULL_TIMES=3 -DENC_DEEP_INLINE -DL2G_ENABLE \
+             -I$(ENC_INCLUDE) -include $(ENC_INCLUDE)/enc_options.h
+
+# Apply to compiler flags
+CC     := clang
+CFLAGS := -O2 $(ENC_FLAGS)
+
+# Build rules
+TARGET := myapp
+SRCS   := main.c utils.c
+OBJS   := $(SRCS:.c=.o)
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) -o $@ $^
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(TARGET) $(OBJS)
+
+.PHONY: all clean
+```
+
+The pattern is the same: define `ENC_FLAGS` with the plugin path and configuration, then include it in `CFLAGS`.
+
 ### Module-Specific Overrides
 
 In any source file, you can override settings by placing `#define` directives before including the header:
