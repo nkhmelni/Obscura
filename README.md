@@ -57,7 +57,7 @@ Download the release that matches your LLVM version. Using a mismatched version 
    obscura-llvm17.0.6-arm64/
    ├── lib/
    │   ├── libObscura.dylib
-   │   └── libEncDeps.dylib
+   │   └── libDeps.dylib
    └── include/
        └── enc_options.h
    ```
