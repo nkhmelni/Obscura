@@ -6,7 +6,7 @@ This document covers how to use encryption, filters, and L2G together, including
 
 In the context of the Encryption Pass, a **module** is a single source file being compiled. When you compile `main.c`, that's one module. When you compile `utils.c`, that's another module.
 
-Each module is processed independently by the compiler, which means you can configure the Encryption Pass differently for each source file.
+Each module is processed independently by the compiler, which means you can configure Obscura differently for each source file.
 
 ## Per-Module Configuration
 
