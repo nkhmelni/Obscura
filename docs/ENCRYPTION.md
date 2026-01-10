@@ -6,7 +6,7 @@ This document covers the encryption levels, options, and behavior of the Encrypt
 
 The Encryption Pass protects global variable initializers by encrypting their values at compile time and inserting runtime decryption code. This makes static analysis significantly harder, as sensitive data is not visible in the binary's data sections.
 
-> **Important:** Compile with `-O0` or `-O1` for proper obfuscation. Higher optimization levels may inline or eliminate the decryption code, reducing protection.
+> **Important:** Compile with `-O0` or `-O1` for proper obfuscation. Higher optimization levels may inline or eliminate the decryption code, causing incorrect decryption results and wrong final values.
 
 ## Encryption Levels
 
@@ -88,7 +88,7 @@ You can apply encryption multiple times for increased obfuscation:
 | `ENC_DEEP_TIMES=n` | Apply Deep encryption `n` times |
 | `ENC_FULL_TIMES=n` | Set both iteration counts to `n` |
 
-Values from 1 to 15 are supported.
+All values are supported, but going beyond 15 is not recommended for performance reasons.
 
 ```bash
 # 3 iterations of Lite encryption
@@ -130,10 +130,12 @@ clang ... -DENC_FULL -DENC_DEEP_INLINE ...
 
 The encryption pass handles:
 
-- **Integers**: Any bit width (8, 16, 32, 64, etc.)
+- **Integers**: Any bit width (8, 16, 32, 64, etc.), including `char`
 - **Floats**: half, bfloat, float, double
 - **Arrays**: Integer and float arrays
 - **Vectors**: SIMD vector types
+
+Since `char` is an integer type and C strings are character arrays, primitive string literals stored in global variables are also encrypted.
 
 ## Example
 
