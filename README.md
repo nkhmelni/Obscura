@@ -1,6 +1,6 @@
 # Obscura
 
-An LLVM pass plugin that encrypts global variable initializers and inserts runtime decryption code. Protects sensitive data from static analysis while maintaining full runtime functionality.
+An LLVM pass plugin for variable encryption and subsequent runtime decryption. Protects sensitive data from static (and dynamic) analysis while maintaining full functionality, with manageable performance overhead.
 
 ## Features
 
