@@ -40,8 +40,8 @@ CFLAGS += $(OBSCURA_FLAGS)
 
 > **Tip:** Use parallel builds for faster compilation:
 > ```bash
-> make -j8                    # Make with 8 parallel jobs
-> cmake -G Ninja .. && ninja  # Or use Ninja for even better parallelism
+> make -j8                        # Make with 8 parallel jobs
+> cmake -G Ninja .. && ninja -j8  # Or use Ninja for even better parallelism
 > ```
 
 ### Module-Specific Overrides
