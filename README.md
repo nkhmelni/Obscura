@@ -1,5 +1,7 @@
 # Obscura
 
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
 An LLVM pass plugin for variable encryption and subsequent runtime decryption. Protects sensitive data from static (and dynamic) analysis while maintaining full functionality, with manageable performance overhead.
 
 ## Features
