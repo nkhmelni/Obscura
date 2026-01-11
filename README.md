@@ -181,6 +181,8 @@ See the [sample/](sample/) directory for a complete working example with CMake.
 
 ## License
 
-This project is licensed under the [GNU Affero General Public License v3.0](LICENSE) (AGPL-3.0).
+This project is licensed under [CC BY-NC 4.0](LICENSE) (Creative Commons Attribution-NonCommercial 4.0).
 
-If you use this software (including over a network), you must release your source code under the same license.
+- **Permitted**: Personal use, research, education, non-commercial projects
+- **Required**: Attribution
+- **Not permitted**: Commercial use
