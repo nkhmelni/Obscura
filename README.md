@@ -16,12 +16,18 @@ Obscura is built against a specific LLVM version. Your compiler's LLVM version m
 
 **Why this matters:** Different LLVM versions have slightly different internal ABIs. If the versions don't match, symbols may be resolved incorrectly, leading to crashes or undefined behavior.
 
-### Tested Configuration
+### Available Versions
 
-The current release was tested with:
-- **LLVM 17.0.6**
-- **AppleClang 16.0.0** (clang-1600.0.26.4)
-- **Languages:** C, C++, Objective-C, Objective-C++
+Obscura is released for multiple LLVM versions:
+
+| LLVM Version | Status |
+|--------------|--------|
+| 19.1.5 | Latest |
+| 19.1.4 | Stable |
+| 17.0.6 | Stable (tested with AppleClang 16.0.0) |
+| 16.0.0 | Stable |
+
+**Languages:** C, C++, Objective-C, Objective-C++
 
 Other LLVM-based compilers that support plugins (e.g., Swift, Rust) may also work if they use a compatible LLVM version—this is untested and left for you to explore.
 
@@ -31,9 +37,12 @@ Xcode bundles a specific LLVM version. Check the release filename for the LLVM v
 
 | Xcode Version | LLVM Version |
 |---------------|--------------|
-| 16.0 - 16.2 | LLVM 17.0.6 |
+| 26.0 - 26.2 | 19.1.5 |
+| 16.3 - 16.4 | 19.1.4 |
+| 16.0 - 16.2 | 17.0.6 |
+| 15.0 - 15.4 | 16.0.0 |
 
-For a complete Xcode-to-LLVM version mapping, see: [Wikipedia: Xcode Version History](https://en.wikipedia.org/wiki/Xcode#Xcode_7.0_-_11.x_(since_Free_On-Device_Development))
+For a complete Xcode-to-LLVM version mapping, see: [Wikipedia: Xcode Version History](https://en.wikipedia.org/wiki/Xcode#Xcode_15.0_-_16.x_(since_visionOS_support))
 
 ### Non-Xcode Users
 
@@ -50,16 +59,16 @@ Download the release that matches your LLVM version. Using a mismatched version 
 1. Download the release matching your LLVM version from [Releases](../../releases)
 2. Extract the archive:
    ```bash
-   tar -xzf obscura-llvm17.0.6-arm64.tar.gz
+   tar -xJf obscura-llvm<VERSION>-<ARCH>.tar.xz
+   # Example: tar -xJf obscura-llvm17.0.6-arm64.tar.xz
    ```
 3. You'll have:
    ```
-   obscura-llvm17.0.6-arm64/
-   ├── lib/
-   │   ├── libObscura.dylib
-   │   └── libDeps.dylib
-   └── include/
-       └── config.h
+   lib/
+   ├── libObscura.dylib
+   └── libDeps.dylib
+   include/
+   └── config.h
    ```
 
 Both `.dylib` files must be in the same directory.
