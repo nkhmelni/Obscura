@@ -181,9 +181,6 @@ See the [sample/](sample/) directory for a complete working example with CMake.
 
 ## License
 
-This project is licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE).
+This project is licensed under the [GNU Affero General Public License v3.0](LICENSE) (AGPL-3.0).
 
-- **Permitted**: Personal use, research, education, hobby projects
-- **Not permitted**: Commercial use
-
-For commercial licensing inquiries, please contact the author.
+If you use this software (including over a network), you must release your source code under the same license.
