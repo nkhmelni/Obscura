@@ -1,0 +1,36 @@
+Required Notice: Copyright (c) 2025-2026 Nikita Hmelnitkii. All rights reserved.
+
+Obscura — LLVM Obfuscation Pass Plugin
+
+Licensed under the PolyForm Noncommercial License 1.0.0.
+See LICENSE for the full license text.
+
+For commercial licensing, contact the author.
+
+================================================================================
+
+Third-Party Acknowledgments
+
+================================================================================
+
+1. LLVM Project
+   https://llvm.org/
+   Licensed under the Apache License 2.0 with LLVM Exceptions.
+   See https://llvm.org/LICENSE.txt
+
+   Obscura is an out-of-tree LLVM pass plugin that links against the
+   LLVM framework. LLVM itself is not included in or modified by this
+   distribution.
+
+2. Hikari
+   Original author: Naville Zhang (https://github.com/AkivGit)
+   https://github.com/AkivGit/Hikari (archived, LLVM 8)
+
+   Several obfuscation passes in Obscura were inspired by techniques
+   originally implemented in the Hikari project, an LLVM-based
+   obfuscation framework. These passes have been independently
+   reimplemented for the LLVM new Pass Manager (LLVM 17+) with
+   substantial architectural changes, new features, and bug fixes.
+
+   Hikari itself is a fork of LLVM and was distributed under the
+   Apache License 2.0 with LLVM Exceptions.
