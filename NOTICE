@@ -23,13 +23,13 @@ Third-Party Acknowledgments
    distribution.
 
 2. Hikari
-   Original author: Naville Zhang (https://github.com/AkivGit)
-   https://github.com/AkivGit/Hikari (archived, LLVM 8)
+   Original author: Naville Zhang (https://github.com/Naville)
+   https://github.com/HikariObfuscator/Hikari (archived, LLVM 8)
 
    Several obfuscation passes in Obscura were inspired by techniques
    originally implemented in the Hikari project, an LLVM-based
    obfuscation framework. These passes have been independently
-   reimplemented for the LLVM new Pass Manager (LLVM 17+) with
+   reimplemented for the LLVM new Pass Manager (LLVM 16+) with
    substantial architectural changes, new features, and bug fixes.
 
    Hikari itself is a fork of LLVM and was distributed under the
