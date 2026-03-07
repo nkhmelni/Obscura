@@ -23,7 +23,7 @@ The plugin runs in four phases:
 
 ## Passes
 
-All passes are off by default (when config.h is included). Enable them with `-D` flags and `#include "config.h"`. It's recommended to do it globally, through a build system flag or a compiler flag.
+All passes are off by default (when config.h is included). Enable them with `-D` flags and include `config.h`. It's recommended to do it globally, through a build system flag or a compiler flag.
 
 If config.h is **not** included, the plugin applies built-in defaults automatically:
 
