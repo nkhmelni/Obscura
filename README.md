@@ -8,7 +8,7 @@ Obscura works with any LLVM-based compiler that supports `-fpass-plugin` (Clang,
 
 ## How it works
 
-LLVM's new PM lets you inject custom compiler passes (at the IR phase) into the optimization pipeline LEGALLY, without any modifications to the compiler itselt. Eventually, you don't need to build LLVM anymore, and older projects like Hanabi that based on earlier versions of LLVM now render completely irrelevant, though they used to provide a great extent of convenience a while ago.
+LLVM's new PM lets you inject custom compiler passes (at the IR phase) into the optimization pipeline LEGALLY, without any modifications to the compiler itself. Eventually, you don't need to build LLVM anymore, and older projects like Hanabi that based on earlier versions of LLVM now render completely irrelevant, though they used to provide a great extent of convenience a while ago.
 
 Obscura registers its passes at the `OptimizerLastEP` callback, which fires after all standard optimizations — at any `-O` level, including `-O0`. However, optimization levels other than `-O1` aren't tested so well. `-O1` is therefore recommended.
 
