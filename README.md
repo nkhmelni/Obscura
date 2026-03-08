@@ -4,7 +4,7 @@
 
 An LLVM pass plugin that obfuscates compiled code. It ships 12 passes covering constant encryption, string encryption, control flow manipulation, anti-debugging, and ObjC metadata protection (didn't I forget something?). Everything is controlled through compiler flags — no source changes required beyond including a single header.
 
-Obscura works with any LLVM-based compiler that supports `-fpass-plugin` (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add rustc (Rust) support in the future if any demand arises.
+Obscura works with any LLVM-based compiler that supports `-fpass-plugin` (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add rustc (Rust) support in the future if any demand arises. See [Installation](#installation) for quick setup.
 
 ## How it works
 
