@@ -176,7 +176,7 @@ Applies to `.c` and `.m` files only.
 -include $(OBSCURA_PATH)/include/config.h
 ```
 
-<img src="docs/images/c-flags.png" width="700">
+<img src="docs/images/c-flags.png" width="100%">
 
 #### Other C++ Flags (`OTHER_CPLUSPLUSFLAGS`)
 
@@ -187,7 +187,7 @@ Applies to `.cpp` and `.mm` files only. This setting usually inherits from `OTHE
 -include $(OBSCURA_PATH)/include/config.h
 ```
 
-<img src="docs/images/cxx-flags.png" width="700">
+<img src="docs/images/cxx-flags.png" width="100%">
 
 #### Preprocessor Macros (`GCC_PREPROCESSOR_DEFINITIONS`)
 
@@ -199,7 +199,7 @@ ENABLE_FCO FCO_HIDE_FW
 ENABLE_STRCRY STRCRY_PROB=100 
 ```
 
-<img src="docs/images/prep-macros.png" width="700">
+<img src="docs/images/prep-macros.png" width="100%">
 
 #### Other Linker Flags (`OTHER_LDFLAGS`)
 
@@ -209,7 +209,7 @@ Stripping flag for FCO to produce proper impact and just general stripping go he
 -Wl,-dead_strip_dylibs -Wl,-x
 ```
 
-<img src="docs/images/linker-flags.png" width="700">
+<img src="docs/images/linker-flags.png" width="100%">
 
 #### Swift (`OTHER_SWIFT_FLAGS`)
 
@@ -219,7 +219,7 @@ Requires **Swift 6.2+** (Xcode 26+). The flag name is different from Clang's:
 -load-pass-plugin=$(OBSCURA_PATH)/lib/libObscura.dylib
 ```
 
-<img src="docs/images/swift-flags.png" width="700">
+<img src="docs/images/swift-flags.png" width="100%">
 
 ## Caveats
 
