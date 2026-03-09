@@ -53,14 +53,14 @@ Index encryption and relative offset tables are always on. There's no flag to di
 
 ```c
 // Enable for a specific function
-__attribute__((annotate("indibran")))
+OBSCURA_ANNOTATE("indibran")
 
 // Disable for a specific function
-__attribute__((annotate("noindibran")))
+OBSCURA_ANNOTATE("noindibran")
 
 // Override probability
-__attribute__((annotate("indibran indibran_prob=50")))
+OBSCURA_ANNOTATE("indibran indibran_prob=50")
 
 // Hikari alias
-__attribute__((annotate("indibr")))
+OBSCURA_ANNOTATE("indibr")
 ```

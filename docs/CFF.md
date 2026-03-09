@@ -39,15 +39,15 @@ CFF has no iteration count flag - one pass is sufficient. Unlike BCF (which laye
 
 ```c
 // Enable for a specific function
-__attribute__((annotate("cff")))
+OBSCURA_ANNOTATE("cff")
 
 // Disable for a specific function
-__attribute__((annotate("nocff")))
+OBSCURA_ANNOTATE("nocff")
 
 // Override probability
-__attribute__((annotate("cff cff_prob=50")))
+OBSCURA_ANNOTATE("cff cff_prob=50")
 
 // Hikari aliases
-__attribute__((annotate("fla")))       // -> cff
-__attribute__((annotate("cffobf")))    // -> cff
+OBSCURA_ANNOTATE("fla")       // -> cff
+OBSCURA_ANNOTATE("cffobf")    // -> cff
 ```

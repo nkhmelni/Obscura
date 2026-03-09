@@ -8,7 +8,7 @@ Runs in Phase 1, immediately before CONSTENC. Generated globals are tagged with 
 
 Two modes: **marker mode** and **automatic mode**.
 
-Marker mode is always active. The user annotates individual variables with the `L2G` macro (`__attribute__((annotate("l2g")))`), and L2G promotes exactly those variables. No `-D` flag needed - if any `l2g` annotation exists in the module, the pass processes it.
+Marker mode is always active. The user annotates individual variables with the `L2G` macro (`OBSCURA_ANNOTATE("l2g")`), and L2G promotes exactly those variables. No `-D` flag needed - if any `l2g` annotation exists in the module, the pass processes it.
 
 Automatic mode is enabled by `-DL2G_ENABLE`. All eligible constants in all functions are promoted, subject to type flags and probability. The two modes compose - marker promotions run first, then automatic promotions (arrays first, then scalar operands).
 

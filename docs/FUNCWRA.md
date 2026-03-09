@@ -2,7 +2,7 @@
 
 Wraps call sites through intermediary functions. A call `foo(a, b)` becomes `wrapper(a, b) -> foo(a, b)`, with configurable nesting depth. Static call graph edges are severed - disassemblers and decompilers must resolve each wrapper to recover the original callee.
 
-Ported from Hikari with fixes for symbol leakage, self-recursion, musttail, calling convention propagation, and tail call optimization. Hikari used `"FunctionWrapper"` as the function name with `InternalLinkage` - `nm -a` on the binary showed `_FunctionWrapper`, `_FunctionWrapper.1`, etc., a clear fingerprint. Obscura uses randomized `.fw.XXXXXX` names with `PrivateLinkage` (maps to `l_` prefix on macOS - stripped by the linker, zero trace in the binary).
+Ported from Hikari with fixes for symbol leakage, self-recursion, musttail, calling convention propagation, and tail call optimization. Hikari used `"FunctionWrapper"` as the function name with `InternalLinkage` - `nm -a` on the binary showed `_FunctionWrapper`, `_FunctionWrapper.1`, etc., a clear fingerprint. Obscura uses randomized names with `PrivateLinkage` (maps to `l_` prefix on macOS - stripped by the linker, zero trace in the binary).
 
 Runs in Phase 3, after BCF, CFF, SUB, and SPLIT (Phase 2). This means wrapper bodies - a single call and return - are never obfuscated by those passes. Moving earlier wouldn't help much: the bodies have no arithmetic, branches, or loops for those passes to act on.
 
@@ -30,11 +30,11 @@ At `-O1` and above, LLVM's inliner may inline the trivial wrappers back into the
 
 ```c
 // Wrap every call in this function, 3 layers deep
-__attribute__((annotate("funcwra funcwra_prob=100 funcwra_times=3")))
+OBSCURA_ANNOTATE("funcwra funcwra_prob=100 funcwra_times=3")
 
 // Leave this function's calls alone
-__attribute__((annotate("nofuncwra")))
+OBSCURA_ANNOTATE("nofuncwra")
 
 // Hikari alias
-__attribute__((annotate("fw")))
+OBSCURA_ANNOTATE("fw")
 ```

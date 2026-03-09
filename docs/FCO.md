@@ -49,8 +49,8 @@ Known limitation: `___CFConstantStringClassReference` keeps CoreFoundation in `L
 
 ```c
 // Enable for a specific function
-__attribute__((annotate("fco")))
+OBSCURA_ANNOTATE("fco")
 
 // Disable for a specific function
-__attribute__((annotate("nofco")))
+OBSCURA_ANNOTATE("nofco")
 ```

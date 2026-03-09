@@ -44,20 +44,20 @@ Per-block probability is hash-based (`fnv1a` mixed with iteration and block inde
 
 ```c
 // Enable/disable BCF for this function
-__attribute__((annotate("bcf")))
-__attribute__((annotate("nobcf")))
+OBSCURA_ANNOTATE("bcf")
+OBSCURA_ANNOTATE("nobcf")
 
 // Override parameters
-__attribute__((annotate("bcf bcf_prob=100 bcf_loop=3 bcf_cond_compl=5")))
+OBSCURA_ANNOTATE("bcf bcf_prob=100 bcf_loop=3 bcf_cond_compl=5")
 
 // Toggle junk asm modes
-__attribute__((annotate("bcf bcf_junkasm")))
-__attribute__((annotate("bcf bcf_onlyjunkasm")))
-__attribute__((annotate("nobcf_junkasm")))
+OBSCURA_ANNOTATE("bcf bcf_junkasm")
+OBSCURA_ANNOTATE("bcf bcf_onlyjunkasm")
+OBSCURA_ANNOTATE("nobcf_junkasm")
 
 // Junk asm count range
-__attribute__((annotate("bcf bcf_junkasm bcf_junkasm_minnum=4 bcf_junkasm_maxnum=8")))
+OBSCURA_ANNOTATE("bcf bcf_junkasm bcf_junkasm_minnum=4 bcf_junkasm_maxnum=8")
 
 // Move predicates to separate functions
-__attribute__((annotate("bcf bcf_createfunc")))
+OBSCURA_ANNOTATE("bcf bcf_createfunc")
 ```

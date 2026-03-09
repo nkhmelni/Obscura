@@ -65,8 +65,8 @@ NO_CONSTENC int skip_this = 42;
 L2G NO_CONSTENC int local_secret = 7;
 
 // Per-function annotation (enable/disable for all constants in that function's scope)
-__attribute__((annotate("constenc")))
-__attribute__((annotate("noconstenc")))
-__attribute__((annotate("constenc_prob=80")))
-__attribute__((annotate("constenc_times=3")))
+OBSCURA_ANNOTATE("constenc")
+OBSCURA_ANNOTATE("noconstenc")
+OBSCURA_ANNOTATE("constenc_prob=80")
+OBSCURA_ANNOTATE("constenc_times=3")
 ```

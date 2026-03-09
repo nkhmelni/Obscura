@@ -54,7 +54,7 @@ Runtime overhead is entirely at load time - zero steady-state cost. A class with
 
 ```objc
 // Exclude a class (annotate any method, instance or class)
-__attribute__((annotate("noacd")))
+OBSCURA_ANNOTATE("noacd")
 - (void)sensitiveMethod { ... }
 ```
 

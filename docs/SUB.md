@@ -30,11 +30,11 @@ The `ENABLE_SUBOBF` spelling is accepted as a Hikari compatibility alias for `EN
 
 ```c
 // Enable for this function only
-__attribute__((annotate("sub")))
+OBSCURA_ANNOTATE("sub")
 
 // Disable for this function
-__attribute__((annotate("nosub")))
+OBSCURA_ANNOTATE("nosub")
 
 // Override probability and loop count
-__attribute__((annotate("sub sub_prob=100 sub_loop=3")))
+OBSCURA_ANNOTATE("sub sub_prob=100 sub_loop=3")
 ```

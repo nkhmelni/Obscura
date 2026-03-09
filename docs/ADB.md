@@ -31,11 +31,11 @@ BCF's `hasBCFRestriction` detects inline asm with register clobber constraints (
 
 ```c
 // Enable for a specific function
-__attribute__((annotate("adb")))
+OBSCURA_ANNOTATE("adb")
 
 // Disable for a specific function
-__attribute__((annotate("noadb")))
+OBSCURA_ANNOTATE("noadb")
 
 // Override probability
-__attribute__((annotate("adb adb_prob=80")))
+OBSCURA_ANNOTATE("adb adb_prob=80")
 ```

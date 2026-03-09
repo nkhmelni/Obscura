@@ -37,14 +37,14 @@ Hikari's `ENABLE_STRENC` alias works too.
 
 ```c
 // Enable for a specific function
-__attribute__((annotate("strcry")))
+OBSCURA_ANNOTATE("strcry")
 
 // Disable for a specific function
-__attribute__((annotate("nostrcry")))
+OBSCURA_ANNOTATE("nostrcry")
 
 // Override probability
-__attribute__((annotate("strcry strcry_prob=50")))
+OBSCURA_ANNOTATE("strcry strcry_prob=50")
 
 // Hikari alias
-__attribute__((annotate("strenc")))
+OBSCURA_ANNOTATE("strenc")
 ```

@@ -2,30 +2,30 @@
 
 [![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm%20Noncommercial-purple.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0)
 
-An LLVM pass plugin that obfuscates compiled code. It ships 12 passes covering constant encryption, string encryption, control flow manipulation, anti-debugging, and ObjC metadata protection (didn't I forget something?). Everything is controlled through compiler flags — no source changes required beyond including a single header.
+An LLVM pass plugin that obfuscates compiled code. It ships 12 passes covering constant encryption, string encryption, control flow manipulation, anti-debugging, and ObjC metadata protection (didn't I forget something?). Everything is controlled through compiler flags - no source changes required beyond including a single header.
 
-Obscura works with any LLVM-based compiler that supports `-fpass-plugin` (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add rustc (Rust) support in the future if any demand arises. See [Installation](#installation) for quick setup.
+Obscura works with any LLVM-based compiler that supports `-fpass-plugin` (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add more explicit rustc (Rust) support in the future if any demand arises. See [Installation](#installation) for quick setup, and read [Compatibility](#compatibility) carefully.
 
 ## How it works
 
 LLVM's new PM lets you inject custom compiler passes (at the IR phase) into the optimization pipeline LEGALLY, without any modifications to the compiler itself. Eventually, you don't need to build LLVM anymore, and older projects like Hanabi that based on earlier versions of LLVM now render completely irrelevant, though they used to provide a great extent of convenience a while ago.
 
-Obscura registers its passes at the `OptimizerLastEP` callback, which fires after all standard optimizations — at any `-O` level, including `-O0`. However, optimization levels other than `-O1` aren't tested so well. `-O1` is therefore recommended.
+Obscura registers its passes at the `OptimizerLastEP` callback, which fires after all standard optimizations — at any optimization level, including `-O0`. However, optimization levels other than `-O1` aren't tested so well. `-O1` is therefore recommended.
 
-You include `config.h` in your source and pass `-D` flags to the compiler. These flags create marker globals in the IR that survive optimization. The plugin reads them and decides what to do. If no config header is included (no config marker found), a preferred set of obfuscation passes runs, for the sake of quick setup convenience.
+You include `config.h` in your source and pass `-D` flags to the compiler. These flags create marker globals in the IR that survive optimization. The plugin reads them and decides what to do. If no config header is included (no config marker found), a preferred set of obfuscation passes runs, for the sake of quick setup and convenience.
 
 The plugin runs in four phases:
 
-1. **Code insertion** — Anti-ClassDump metadata protection, constant encryption, string encryption, anti-debug checks, and dynamic symbol resolution. These passes add new code to the module.
-2. **Code obfuscation** — Block splitting, bogus control flow, control flow flattening, and instruction substitution. These passes obfuscate everything from phase 1 (and the original code), so decryption routines are never left in the clear.
-3. **Structural obfuscation** — Indirect branching and function wrapping. These break the call graph and control flow at the module level.
+1. **Code insertion** - Anti-ClassDump metadata protection, constant encryption, string encryption, anti-debug checks, and dynamic symbol resolution. These passes add new code to the module.
+2. **Code obfuscation** - Block splitting, bogus control flow, control flow flattening, and instruction substitution. These passes obfuscate everything from phase 1 (and the original code), so decryption routines are never left in the clear.
+3. **Structural obfuscation** - Indirect branching and function wrapping. These break the call graph and control flow at the module level.
 4. **Cleanup** — Marker globals are removed. Nothing plugin-related survives in the final binary.
 
 ## Passes
 
-All passes are off by default (when config.h is included). Enable them with `-D` flags and include `config.h`. It's recommended to do it globally, through a build system flag or a compiler flag.
+All passes are off IF `config.h` is included. Enable them with `-D` flags. It's recommended to do it globally, through a build system flag or a straight compiler flag.
 
-If config.h is **not** included, the plugin applies built-in defaults automatically:
+If config.h is **not** included, the plugin applies built-in defaults automatically (optimal configuration as I see it):
 
 | Pass | Settings |
 |------|----------|
@@ -43,7 +43,7 @@ If config.h is **not** included, the plugin applies built-in defaults automatica
 | FUNCWRA | off |
 | PRNG_SEED | 42 |
 
-FUNCWRA is pretty useless in this combination, since it's counterproductive in relation to the effect that the FUNCWRA-less set of flags produces.
+FUNCWRA is disabled in this combination, since it's counterproductive in relation to the effect that the FUNCWRA-less set of flags produces. I recommend copying these settings and amending however you like if you desire a manual setup.
 
 | Pass | Flag | What it does | Platform |
 |------|------|--------------|----------|
@@ -82,7 +82,9 @@ int heavily_protected(int x) { ... }
 
 ## Compatibility
 
-Obscura is built against a specific LLVM version. Your compiler's LLVM version **must match** — different versions have different internal ABIs, and a mismatch will crash the compiler.
+Obscura is built against a specific LLVM version. You **must** download a release with the LLVM version falling within the Xcode version matrix shown below. For instance, LLVM 19.1.4 and 19.1.5 have different ABIs, and AppleClang would simply crash at a point if there's a version mismatch.
+
+For Linux builds, the LLVM version **must match** your host clang's LLVM version (the one it's running on), and that's up to you to find out your clang's LLVM version.
 
 | LLVM | Status | Xcode |
 |------|--------|-------|
@@ -111,16 +113,16 @@ lib/libDeps.dylib       — LLVM symbol fallback (macOS only)
 include/config.h        — configuration header
 ```
 
-Both dylibs must stay in the same directory.
+On MacOS (Darwin), it's **essential** that both dylibs exist and rest in the same directory, since AppleClang doesn't export all LLVM symbols (good job to Apple!). Otherwise, you'll get crashes at seemingly random points (SIGSEGV at 0x0 from unresolved lazy stubs). This isn't the case for Linux.
 
 ## Usage
 
-**Important:** Use `-fpass-plugin=`, not `-fplugin=`. AppleClang's `-fplugin` is a completely different thing (frontend).
+**Important:** `-Wl,-x` is recommended for all builds. Obscura already uses `PrivateLinkage` and `HiddenVisibility` to eliminate most generated symbols, but `-x` catches anything else the linker might keep around (local symbols, debug nlist symtab entries). It's cheap and there's no reason not to. Additionally, `-Wl,-dead_strip_dylibs` is required for FCO to function properly (described in [FCO](docs/FCO.md)).
 
 ### Minimal
 
 ```bash
-clang -fpass-plugin=lib/libObscura.dylib -O1 file.c -o out
+clang -fpass-plugin=lib/libObscura.dylib -Wl,-dead_strip_dylibs -Wl,-x -O1 file.c -o out
 ```
 
 ### With controlled obfuscation
@@ -161,19 +163,68 @@ add_compile_options(
 add_link_options(-Wl,-dead_strip_dylibs -Wl,-x)
 ```
 
+### Xcode integration
+
+For convenience, define a user-defined build setting `OBSCURA_PATH` pointing to the Obscura directory (e.g. `$(SRCROOT)/obscura`). Reference it with `$(OBSCURA_PATH)` in the settings below (Build Settings).
+
+#### Other C Flags (`OTHER_CFLAGS`)
+
+Applies to `.c` and `.m` files only.
+
+```
+-fpass-plugin=$(OBSCURA_PATH)/lib/libObscura.dylib
+-include $(OBSCURA_PATH)/include/config.h
+```
+
+<img src="docs/images/c-flags.png" width="700">
+
+#### Other C++ Flags (`OTHER_CPLUSPLUSFLAGS`)
+
+Applies to `.cpp` and `.mm` files only. This setting usually inherits from `OTHER_CFLAGS`, but you should verify anyway.
+
+```
+-fpass-plugin=$(OBSCURA_PATH)/lib/libObscura.dylib
+-include $(OBSCURA_PATH)/include/config.h
+```
+
+<img src="docs/images/cxx-flags.png" width="700">
+
+#### Preprocessor Macros (`GCC_PREPROCESSOR_DEFINITIONS`)
+
+Add your obfuscation flags here. Xcode auto-prepends `-D` to each entry.
+
+```
+ENABLE_ACD ACD_PROB=100
+ENABLE_FCO FCO_HIDE_FW
+ENABLE_STRCRY STRCRY_PROB=100 
+```
+
+<img src="docs/images/prep-macros.png" width="700">
+
+#### Other Linker Flags (`OTHER_LDFLAGS`)
+
+Stripping flag for FCO to produce proper impact and just general stripping go here. Should apply to the whole build.
+
+```
+-Wl,-dead_strip_dylibs -Wl,-x
+```
+
+<img src="docs/images/linker-flags.png" width="700">
+
+#### Swift (`OTHER_SWIFT_FLAGS`)
+
+Requires **Swift 6.2+** (Xcode 26+). The flag name is different from Clang's:
+
+```
+-load-pass-plugin=$(OBSCURA_PATH)/lib/libObscura.dylib
+```
+
+<img src="docs/images/swift-flags.png" width="700">
+
 ## Caveats
 
-**LLVM version must match exactly.**
-Not approximately — exactly. LLVM 19.1.4 and 19.1.5 have different ABIs, and AppleClang would simply crash at a point.
-
-**Strip your binaries.**
-`-Wl,-x` is recommended for all builds. Obscura already uses `PrivateLinkage` and `HiddenVisibility` to eliminate most generated symbols, but `-x` catches anything else the linker might keep around (local symbols, debug nlist entries). It's cheap and there's no reason not to. Additionally, `-Wl,-dead_strip_dylibs` is required for FCO to function properly (described in [FCO](docs/FCO.md)).
-
-**libDeps.dylib is required on macOS.**
-AppleClang doesn't export all LLVM symbols that plugins need (good job Apple). libDeps provides fallbacks. If it's missing, you'll get crashes at seemingly random points (SIGSEGV at 0x0 from unresolved lazy stubs).
-
 **Darwin-only passes on non-Darwin = no-op.**
-ADB, FCO, and ACD silently do nothing (or almost nothing) on Linux. They depend on Mach-O, the ObjC runtime, or AArch64 Darwin syscall conventions. I might add partial Linux support for these passes in the future, but it's not a serious concern for now.
+ADB, FCO, and ACD silently do nothing (or very little) on Linux. ACD would unlikely run at all (it largely depends on the ObjC runtime, but might eventually resolve things from the SDK), ADB would only be impactful if the build target runs on Darwin, and FCO also depends on the ObjC runtime to a great extent. I might add partial Linux support for these passes in the future, but it's not a serious concern for now.
 
 **Reproducibility requires `PRNG_SEED`.**
 Without a fixed seed, some passes use time-based randomization. Set `PRNG_SEED=N` for deterministic builds. Some passes might anyway be not enough deterministic even with the seed set, which should be reported.

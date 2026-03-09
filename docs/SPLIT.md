@@ -23,11 +23,11 @@ For each eligible block, `splitNum` random split points are selected via Fisher-
 
 ```c
 // Enable for a specific function
-__attribute__((annotate("split")))
+OBSCURA_ANNOTATE("split")
 
 // Disable for a specific function
-__attribute__((annotate("nosplit")))
+OBSCURA_ANNOTATE("nosplit")
 
 // Override split count
-__attribute__((annotate("split split_num=4")))
+OBSCURA_ANNOTATE("split split_num=4")
 ```
