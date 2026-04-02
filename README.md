@@ -93,6 +93,8 @@ For Linux builds, the LLVM version **must match** your host clang's LLVM version
 | 19.1.4 | Untested | 16.3 — 16.4 |
 | 17.0.6 | Stable | 16.0 — 16.2 |
 | 16.0.0 | Untested | 15.0 — 15.4 |
+| 16.0.0 | Untested | 15.0 — 15.4 |
+| 13.0.0 | Generally Stable | 13.3–14.2 |
 
 To get to know your LLVM version, just open Xcode and note the version. Then, download the matching release. For a complete Xcode-to-LLVM version mapping (I doubt you'll need it), see [Wikipedia: Xcode Version History](https://en.wikipedia.org/wiki/Xcode#Xcode_15.0_-_16.x_(since_visionOS_support)).
 
