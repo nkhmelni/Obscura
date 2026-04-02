@@ -1,10 +1,10 @@
 # Obscura
 
-[![License: PolyForm Noncommercial](https://img.shields.io/badge/License-PolyForm%20Noncommercial-purple.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0)
+[![License](https://img.shields.io/badge/License-PolyForm%20Noncommercial-purple.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0) [![Release](https://img.shields.io/github/v/release/nkhmelni/Obscura?label=Release&color=blue)](../../releases/latest)
 
-An LLVM pass plugin that obfuscates compiled code. It ships 12 passes covering constant encryption, string encryption, control flow manipulation, anti-debugging, and ObjC metadata protection (didn't I forget something?). Everything is controlled through compiler flags - no source changes required beyond including a single header.
+A hussle-free LLVM-based obfuscator. It ships 13 passes (*now an industry-dominating anti-hook!*) covering ObjC metadata protection, runtime integrity verification, and general code obfuscation. Everything is controlled through a small set of compiler flags. Source code changes are not required.
 
-Obscura works with any LLVM-based compiler that supports `-fpass-plugin` (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add more explicit rustc (Rust) support in the future if any demand arises. See [Installation](#installation) for quick setup, and read [Compatibility](#compatibility) carefully.
+Obscura works with any LLVM-based compiler that supports pass plugins (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add more explicit rustc (Rust) support in the future if any demand arises. See [Installation](#installation) for quick setup, and read [Compatibility](#compatibility) carefully to understand installation requirements.
 
 ## How it works
 
@@ -23,35 +23,16 @@ The plugin runs in four phases:
 
 ## Passes
 
-All passes are off IF `config.h` is included. Enable them with `-D` flags. It's recommended to do it globally, through a build system flag or a straight compiler flag.
-
-If config.h is **not** included, the plugin applies built-in defaults automatically (optimal configuration as I see it):
-
-| Pass | Settings |
-|------|----------|
-| ACD | prob=100 |
-| ADB | prob=100 |
-| CONSTENC | lite only, prob=20 |
-| FCO | on, hide_fw |
-| STRCRY | prob=100 |
-| SPLIT | num=1 |
-| BCF | prob=80, loop=1, cond_compl=3, junkasm, onlyjunkasm, minnum=1, maxnum=3 |
-| CFF | prob=20 |
-| SUB | prob=20, loop=1 |
-| INDIBRAN | prob=100 |
-| L2G | prob=20, dedup |
-| FUNCWRA | off |
-| PRNG_SEED | 42 |
-
-FUNCWRA is disabled in this combination, since it's counterproductive in relation to the effect that the FUNCWRA-less set of flags produces. I recommend copying these settings and amending however you like if you desire a manual setup.
+In general, the following passes are available:
 
 | Pass | Flag | What it does | Platform |
 |------|------|--------------|----------|
 | [Anti-ClassDump](docs/ACD.md) | `ENABLE_ACD` | Hides ObjC class metadata from class-dump (and other static analyzers actually) | ObjC Darwin |
 | [Anti-Debug](docs/ADB.md) | `ENABLE_ADB` | Inserts ptrace-based debugger detection | AArch64 Darwin |
 | [Constant Encryption](docs/CONSTENC.md) | `CONSTENC_LITE`, `CONSTENC_DEEP`, `CONSTENC_FULL` | Encrypts global constants, decrypts at runtime. Use with L2G to get more constants encrypted | All |
-| [Function Call Obfuscate](docs/FCO.md) | `ENABLE_FCO` | Replaces external calls with dlopen/dlsym lookups | Darwin |
+| [Function Call Obfuscate](docs/FCO.md) | `ENABLE_FCO` | Replaces external calls with dlopen/dlsym lookups, and allows imports substitution with your own wrappers | Darwin |
 | [String Encryption](docs/STRCRY.md) | `ENABLE_STRCRY` | Encrypts string literals with per-string inline decrypt loops | All |
+| [Anti-Hook](docs/AH.md) | `ENABLE_AH`, `ENABLE_AH_INLINE`, `ENABLE_AH_REBIND` | Protects against inline hooking (and patching) and symbol rebinding | Darwin, AArch64 |
 | [Basic Block Splitting](docs/SPLIT.md) | `ENABLE_SPLIT` | Splits blocks to create more targets for other passes | All |
 | [Bogus Control Flow](docs/BCF.md) | `ENABLE_BCF` | Inserts cloned blocks behind opaque predicates | All |
 | [Control Flow Flattening](docs/CFF.md) | `ENABLE_CFF` | Replaces branches with switch-based dispatch | All |
@@ -60,9 +41,27 @@ FUNCWRA is disabled in this combination, since it's counterproductive in relatio
 | [Function Wrapper](docs/FUNCWRA.md) | `ENABLE_FUNCWRA` | Wraps call sites through intermediate functions | All |
 | [Local-to-Global](docs/L2G.md) | `L2G_ENABLE` | Promotes local constants to globals (for encryption, has little use separately) | All |
 
-Most passes accept probability and iteration parameters. See the individual docs or `config.h` comments for the full flag list and other details.
+Most passes accept probability and iteration parameters. See the individual docs or `config.h` comments for the full flag list and other useful details.
 
-## Per-function annotations
+All passes are off **IF** `config.h` is included. Enable them with `-D` flags. It's recommended to do so in global scope (not per-TU), through a build system flag or a direct compiler flag. If config.h is **not** included, the plugin applies built-in defaults automatically (most optimal configuration as I see it):
+
+| Pass | Settings |
+|------|----------|
+| ACD | prob=100 |
+| ADB | prob=20 |
+| CONSTENC | lite, prob=20 |
+| FCO | prob=100, hide_fw |
+| STRCRY | prob=100 |
+| AH | full (inline + rebind), prob=100 |
+| SPLIT | num=1 |
+| BCF | prob=20, loop=1, cond_compl=1, junkasm, minnum=1, maxnum=3 |
+| CFF | prob=20 |
+| SUB | prob=20, loop=1 |
+| INDIBRAN | prob=100 |
+| L2G | prob=20, dedup |
+| PRNG | seed=42 |
+
+### Per-function annotations
 
 You can override global settings on a per-function basis without changing `-D` flags. These are (almost) as they were in Hikari, and more annotations will be supported in the future:
 
@@ -80,11 +79,13 @@ OBSCURA_ANNOTATE("bcf bcf_loop=3 bcf_cond_compl=5 indibran indibran_enc_jump")
 int heavily_protected(int x) { ... }
 ```
 
+Module-wide macros and ObjC-specific annotations will be added soon.
+
 ## Compatibility
 
 Obscura is built against a specific LLVM version. You **must** download a release with the LLVM version falling within the Xcode version matrix shown below. For instance, LLVM 19.1.4 and 19.1.5 have different ABIs, and AppleClang would simply crash at a point if there's a version mismatch.
 
-For Linux builds, the LLVM version **must match** your host clang's LLVM version (the one it's running on), and that's up to you to find out your clang's LLVM version.
+For Linux builds, the LLVM version **must match** your host clang's LLVM version (the one it's running on, and keep in mind that `clang -v` only gives you the clang version, NOT the LLVM version), and that's up to you to find out your clang's LLVM version.
 
 | LLVM | Status | Xcode |
 |------|--------|-------|
@@ -93,23 +94,18 @@ For Linux builds, the LLVM version **must match** your host clang's LLVM version
 | 17.0.6 | Stable | 16.0 — 16.2 |
 | 16.0.0 | Untested | 15.0 — 15.4 |
 
-Check your version with `clang --version` (or better just open Xcode and note the version) and download the matching release. For a complete Xcode-to-LLVM version mapping, see [Wikipedia: Xcode Version History](https://en.wikipedia.org/wiki/Xcode#Xcode_15.0_-_16.x_(since_visionOS_support)).
+To get to know your LLVM version, just open Xcode and note the version. Then, download the matching release. For a complete Xcode-to-LLVM version mapping (I doubt you'll need it), see [Wikipedia: Xcode Version History](https://en.wikipedia.org/wiki/Xcode#Xcode_15.0_-_16.x_(since_visionOS_support)).
 
-**Languages:** C(++), Objective-C(++). The latest versions of [Swift](https://github.com/swiftlang/swift) are also supported, but this requires Xcode 26+, as per my knowledge. You may compile the newest runtime by yourself if you wish to have Swift obfuscation supported on earlier versions of Xcode. Regarding Rust support, it's completely uncertain for now, but it's at least known that it runs on LLVM, so might as well be supported by Obscura.
+**Languages:** C(++), Objective-C(++). The latest versions of [Swift](https://github.com/swiftlang/swift) are also supported, but this requires Xcode 26+, as per my knowledge, and a special flag (see below). You may compile the newest runtime by yourself if you wish to have Swift obfuscation supported on earlier versions of Xcode. Regarding Rust support, it's completely uncertain for now, but it's at least known that it runs on LLVM, so might as well be supported by Obscura.
 
 ## Installation
 
-Download the release for your LLVM version from [Releases](../../releases) and extract it:
-
-```
-tar -xJf obscura-llvm19.1.5-darwin-universal.tar.xz
-```
-
-You get:
+Download the release for your LLVM version from [Releases](../../releases) and extract it. You'll get:
 
 ```
 lib/libObscura.dylib    — the plugin
 lib/libDeps.dylib       — LLVM symbol fallback (macOS only)
+lib/ld.sh               - ld script (required for AH)
 include/config.h        — configuration header
 ```
 
@@ -117,15 +113,15 @@ On MacOS (Darwin), it's **essential** that both dylibs exist and rest in the sam
 
 ## Usage
 
-**Important:** `-Wl,-x` is recommended for all builds. Obscura already uses `PrivateLinkage` and `HiddenVisibility` to eliminate most generated symbols, but `-x` catches anything else the linker might keep around (local symbols, debug nlist symtab entries). It's cheap and there's no reason not to. Additionally, `-Wl,-dead_strip_dylibs` is required for FCO to function properly (described in [FCO](docs/FCO.md)).
+**Important:** `-Wl,-x` is recommended for all builds. Obscura already uses `PrivateLinkage` and `HiddenVisibility` to eliminate most generated symbols, but `-x` catches anything else the linker might keep around (local symbols, debug nlist symtab entries). It's cheap and there's no reason not to. Additionally, `-Wl,-dead_strip_dylibs` is required for FCO to function properly (described in [FCO](docs/FCO.md)). Lastly, `-fuse-ld=lib/ld.sh` is required for [AH](docs/AH.md) inline mode (just set it and forget).
 
 ### Minimal
 
 ```bash
-clang -fpass-plugin=lib/libObscura.dylib -Wl,-dead_strip_dylibs -Wl,-x -O1 file.c -o out
+clang -fpass-plugin=lib/libObscura.dylib -fuse-ld=lib/ld.sh -Wl,-dead_strip_dylibs -Wl,-x -O1 file.c -o out
 ```
 
-### With controlled obfuscation
+### Controlled
 
 ```bash
 clang -fpass-plugin=lib/libObscura.dylib \
@@ -137,18 +133,20 @@ clang -fpass-plugin=lib/libObscura.dylib \
     -O1 file.c -o out
 ```
 
-### Make integration
+### Make
 
 ```makefile
 OBSCURA := /path/to/obscura
 
 CFLAGS += -fpass-plugin=$(OBSCURA)/lib/libObscura.dylib \
           -I$(OBSCURA)/include -include $(OBSCURA)/include/config.h \
-          -DENABLE_STRCRY -DENABLE_INDIBRAN -DENABLE_SUB -DSUB_PROB=80
-LDFLAGS += -Wl,-dead_strip_dylibs -Wl,-x
+          -DENABLE_AH -DAH_CALLBACK=\"on_tamper\" \
+          -DENABLE_INDIBRAN -DENABLE_SUB -DSUB_PROB=80 \
+          -DFCO_MAP=\"dlsym=my_dlsym\;open=my_open\"
+LDFLAGS += -fuse-ld=$(OBSCURA)/lib/ld.sh -Wl,-dead_strip_dylibs -Wl,-x
 ```
 
-### CMake integration
+### CMake
 
 ```cmake
 set(OBSCURA "${CMAKE_SOURCE_DIR}/obscura")
@@ -156,14 +154,16 @@ set(OBSCURA "${CMAKE_SOURCE_DIR}/obscura")
 add_compile_options(
     -fpass-plugin=${OBSCURA}/lib/libObscura.dylib
     -I${OBSCURA}/include -include ${OBSCURA}/include/config.h
+    -DENABLE_AH -DAH_CALLBACK="on_tamper"
     -DENABLE_BCF -DBCF_PROB=100
     -DENABLE_STRCRY
     -DENABLE_CFF
+    -DFCO_MAP="dlsym=my_dlsym;open=my_open"
 )
-add_link_options(-Wl,-dead_strip_dylibs -Wl,-x)
+add_link_options(-fuse-ld=${OBSCURA}/lib/ld.sh -Wl,-dead_strip_dylibs -Wl,-x)
 ```
 
-### Xcode integration
+### Xcode
 
 For convenience, define a user-defined build setting `OBSCURA_PATH` pointing to the Obscura directory (e.g. `$(SRCROOT)/obscura`). Reference it with `$(OBSCURA_PATH)` in the settings below (Build Settings).
 
@@ -203,17 +203,17 @@ ENABLE_STRCRY STRCRY_PROB=100
 
 #### Other Linker Flags (`OTHER_LDFLAGS`)
 
-Stripping flag for FCO to produce proper impact and just general stripping go here. Should apply to the whole build.
+Stripping flag for FCO to produce proper impact and just general stripping go here, along with the linker script for AH (if you want AH to work properly). Should apply to the whole build.
 
 ```
--Wl,-dead_strip_dylibs -Wl,-x
+-fuse-ld=$(OBSCURA_PATH)/lib/ld.sh -Wl,-dead_strip_dylibs -Wl,-x
 ```
 
 <img src="docs/images/linker-flags.png" width="100%">
 
 #### Swift (`OTHER_SWIFT_FLAGS`)
 
-Requires **Swift 6.2+** (Xcode 26+). The flag name is different from Clang's:
+Requires **Swift 6.2+** (Xcode 26+). The flag name is different from clang's:
 
 ```
 -load-pass-plugin=$(OBSCURA_PATH)/lib/libObscura.dylib

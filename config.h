@@ -2,7 +2,7 @@
  * config.h — Obscura configuration
  *
  * Include this (somehow) and pass -D flags to control what gets obfuscated.
- * Full docs can be found in the original repository at https://github.com/nkhmelni/Obscura.
+ * Full docs: https://github.com/nkhmelni/Obscura
  */
 
 #ifndef OBSCURA_CONFIG_H
@@ -329,12 +329,18 @@ __attribute__((used)) static int __obf_indibran_marker = 1;
 __attribute__((used)) static int __obf_indibran_prob = INDIBRAN_PROB; /* 0-100, default 100 */
 #endif
 
-/* Function Call Obfuscate (Darwin — replaces calls with dlsym lookups) */
+/* Function Call Obfuscate (Darwin — replaces imports with dlsym lookups) */
 
 #ifdef ENABLE_FCO
 __attribute__((used)) static int __obf_fco_marker = 1;
 #endif
 
+#ifdef FCO_PROB
+__attribute__((used)) static int __obf_fco_prob = FCO_PROB;          /* 0-100, default 100. Only gates dlsym conversion */
+#endif
+
+/* FCO_HIDE_FW — hide framework dependencies from otool -L. Implies ENABLE_FCO.
+ * Use with -Wl,-dead_strip_dylibs. */
 #ifdef FCO_HIDE_FW
   #ifndef ENABLE_FCO
     #define ENABLE_FCO
@@ -343,12 +349,61 @@ __attribute__((used)) static int __obf_fco_marker = 1;
   __attribute__((used)) static int __obf_fco_hide_fw = 1;
 #endif
 
-#ifdef FCO_FLAG
-__attribute__((used)) static int __obf_fco_flag = FCO_FLAG;
+#ifdef FCO_CONFIG
+__attribute__((used)) static const char __obf_fco_config[] = FCO_CONFIG; /* JSON symbol remap (Hikari compat) */
 #endif
 
-#ifdef FCO_CONFIG
-__attribute__((used)) static const char __obf_fco_config[] = FCO_CONFIG;
+/* FCO_MAP="original=replacement;..." — replace any import with a user wrapper.
+ * Implies ENABLE_FCO. Semicolon-separated key=value pairs. Use C function names.
+ * Define wrappers in one source file (any language, no extern "C" needed).
+ *
+ * Special keys (dlsym, dlopen, objc_getClass, sel_registerName) replace
+ * the functions FCO itself inserts. All other keys replace imports directly.
+ * See docs/FCO.md for details. */
+#ifdef FCO_MAP
+  #ifndef ENABLE_FCO
+    #define ENABLE_FCO
+    __attribute__((used)) static int __obf_fco_marker = 1;
+  #endif
+  __attribute__((used)) static const char __obf_fco_map[] = FCO_MAP;
+#endif
+
+/* Anti-Hook (AArch64 Darwin — code integrity + anti-rebind)
+ *
+ * ENABLE_AH           — both inline + rebind
+ * ENABLE_AH_INLINE    — code integrity only (requires ld.sh)
+ * ENABLE_AH_REBIND    — anti-rebind only (standalone)
+ * Any combination works. AH alone = both sub-flags. */
+
+#ifdef ENABLE_AH
+__attribute__((used)) static int __obf_ah_marker = 1;
+#endif
+
+#ifdef ENABLE_AH_INLINE
+__attribute__((used)) static int __obf_ah_inline_marker = 1;
+#endif
+
+#ifdef ENABLE_AH_REBIND
+__attribute__((used)) static int __obf_ah_rebind_marker = 1;
+#endif
+
+#ifdef AH_PROB
+__attribute__((used)) static int __obf_ah_prob = AH_PROB;            /* 0-100, default 100. Unified for both sub-features */
+#endif
+
+#ifdef AH_INLINE_PROB
+__attribute__((used)) static int __obf_ah_inline_prob = AH_INLINE_PROB; /* overrides AH_PROB for inline */
+#endif
+
+#ifdef AH_REBIND_PROB
+__attribute__((used)) static int __obf_ah_rebind_prob = AH_REBIND_PROB; /* overrides AH_PROB for rebind */
+#endif
+
+/* AH_CALLBACK="name" — called on tamper detection (AH_INLINE only).
+ * Signature: void name(const char *tampered_func_name)
+ * Define in any TU. No extern "C" needed. */
+#ifdef AH_CALLBACK
+__attribute__((used)) static const char __obf_ah_callback[] = AH_CALLBACK;
 #endif
 
 /* Anti-Debug (AArch64 Darwin — ptrace checks) */
@@ -371,6 +426,8 @@ __attribute__((used)) static int __obf_acd_marker = 1;
 __attribute__((used)) static int __obf_acd_prob = ACD_PROB;          /* 0-100, default 100 */
 #endif
 
+/* ACD_CLASS_ALIAS — register original names as runtime aliases so that
+ * NSClassFromString / objc_getClass still resolve after randomization. */
 #ifdef ACD_CLASS_ALIAS
 __attribute__((used)) static int __obf_acd_class_alias = 1;
 #endif
@@ -379,7 +436,7 @@ __attribute__((used)) static int __obf_acd_class_alias = 1;
 
 /* PRNG_SEED=n — fixed seed for reproducible output (default: time-based) */
 #ifdef PRNG_SEED
-__attribute__((used)) static long long __obf_prng_seed = PRNG_SEED;
+__attribute__((used, weak, visibility("default"))) long long __obf_prng_seed = PRNG_SEED;
 #endif
 
 /*--- Hikari compatibility reference ---*
