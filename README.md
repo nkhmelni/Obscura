@@ -6,6 +6,8 @@ A hussle-free LLVM-based obfuscator. It ships 13 passes (*now an industry-domina
 
 Obscura works with any LLVM-based compiler that supports pass plugins (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add more explicit rustc (Rust) support in the future if any demand arises. See [Installation](#installation) for quick setup, and read [Compatibility](#compatibility) carefully to understand installation requirements.
 
+<p align="center"><img src="docs/images/preview.gif" alt="preview" width="800"></p>
+
 ## How it works
 
 LLVM's new PM lets you inject custom compiler passes (at the IR phase) into the optimization pipeline LEGALLY, without any modifications to the compiler itself. Eventually, you don't need to build LLVM anymore, and older projects like Hanabi that based on earlier versions of LLVM now render completely irrelevant, though they used to provide a great extent of convenience a while ago.
@@ -78,8 +80,6 @@ int performance_sensitive(int x) { ... }
 OBSCURA_ANNOTATE("bcf bcf_loop=3 bcf_cond_compl=5 indibran indibran_enc_jump")
 int heavily_protected(int x) { ... }
 ```
-
-Module-wide macros and ObjC-specific annotations will be added soon.
 
 ## Compatibility
 
