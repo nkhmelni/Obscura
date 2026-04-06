@@ -6,7 +6,7 @@ A hussle-free LLVM-based obfuscator. It ships 13 passes (*now an industry-domina
 
 Obscura works with any LLVM-based compiler that supports pass plugins (Clang, AppleClang, and the Swift thing). Thus, obfuscation is effectively achieved for C(++), ObjC(++), and Swift (currently only briefly tested) runtimes. May add more explicit rustc (Rust) support in the future if any demand arises. See [Installation](#installation) for quick setup, and read [Compatibility](#compatibility) carefully to understand installation requirements.
 
-<p align="center"><img src="docs/images/preview.gif" alt="preview" width="800"></p>
+<p align="center"><img src="docs/images/preview.gif" alt="preview" width="100%"></p>
 
 ## How it works
 
